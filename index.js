@@ -5,6 +5,12 @@ const path = require('path');
 const dotgitconfig = require('dotgitconfig');
 const { execSync } = require('child_process');
 
+/**
+ * Prevents obnoxious cmd window popping up on Windows when process runs via pm2
+ * instead of via an already visible terminal.
+ */
+const baseExecOptions = { windowsHide: true };
+
 module.exports = class LCL {
   constructor(dir = process.cwd()) {
     this.gitDirStr = '';
@@ -38,6 +44,7 @@ module.exports = class LCL {
     let gitTag;
     try {
       const opts = {
+        ...baseExecOptions,
         cwd: this.cwd,
         maxBuffer: 1024 * 1024 * 1024,
         // <https://stackoverflow.com/a/45578119
@@ -112,7 +119,7 @@ module.exports = class LCL {
   }
 
   getUserNameSync() {
-    return execSync(`git ${this.gitDirStr} config user.name`)
+    return execSync(`git ${this.gitDirStr} config user.name`, baseExecOptions)
       .toString()
       .trim();
   }
