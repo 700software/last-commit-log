@@ -2,6 +2,12 @@
 
 const { execSync } = require('child_process');
 
+/**
+ * Avoid cmd popups on Windows when there is no visible console (e.g. pm2).
+ * @see index.js baseExecOptions
+ */
+const execOptions = { windowsHide: true };
+
 const fileNameReg = /diff --git a(.*) b.*/;
 const lineReg = /@@ -(.*) \+(.*) @@/;
 
@@ -25,7 +31,7 @@ module.exports = (options = {}) => {
     currentBranch,
     filter,
   ].join(' ');
-  const str = execSync(cmd).toString().trim();
+  const str = execSync(cmd, execOptions).toString().trim();
   if (!str) return null;
   const diffMap = {};
   const diffArray = str.split('\n');
